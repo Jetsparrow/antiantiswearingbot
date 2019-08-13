@@ -1,0 +1,10 @@
+{
+  "BleepedSwearsRegex": "[а-яА-Я@\\*#]+",
+  "SearchDictionary": {
+    "DictionaryPath": "dict/ObsceneDictionaryRu.txt",
+    "LearnNudgeFactor": 0.5,
+    "LearnInitialRating": 0.75,
+    "MinUnlearnNudge": 5,
+    "UnlearnNudgeFactor": 0.66
+  }
+}
