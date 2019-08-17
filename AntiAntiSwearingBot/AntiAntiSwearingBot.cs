@@ -27,7 +27,7 @@ namespace AntiAntiSwearingBot
 
         TelegramBotClient Client { get; set; }
         ChatCommandRouter Router { get; set; }
-        User Me { get; set; }
+        public User Me { get; private set; }
 
         public async Task Init()
         {

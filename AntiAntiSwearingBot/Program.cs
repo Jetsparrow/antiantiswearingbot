@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace AntiAntiSwearingBot
 {
@@ -13,17 +14,36 @@ namespace AntiAntiSwearingBot
             ErrorInvalidCommandLine = 0x100
         };
 
+        static void Log(string m) => Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff}|{m}");
+
         public static int Main(string[] args)
         {
             try
             {
+                Log("AntiAntiSwearBot starting....");
+
                 var cfg = Config.Load<Config>("aasb.cfg.json", "aasb.cfg.secret.json");
                 var dict = new SearchDictionary(cfg);
+                Log($"{dict.Count} words loaded.");
                 var bot = new AntiAntiSwearingBot(cfg, dict);
                 bot.Init().Wait();
-                Console.WriteLine("AntiAntiSwear started. Press any key to exit...");
+                Log($"Connected to Telegram as @{bot.Me.Username}");
+                Log("AntiAntiSwearBot started! Press Ctrl-C to exit.");
                 Environment.ExitCode = (int)ExitCode.ErrorRunning;
-                Console.ReadKey();
+
+                ManualResetEvent quitEvent = new ManualResetEvent(false);
+                try
+                {
+                    Console.CancelKeyPress += (sender, eArgs) => // ctrl-c
+                    {
+                        eArgs.Cancel = true;
+                        quitEvent.Set();
+                    };
+                }
+                catch { }
+
+                quitEvent.WaitOne(Timeout.Infinite);
+
                 Console.WriteLine("Waiting for exit...");
                 bot.Stop().Wait();
                 dict.Save();

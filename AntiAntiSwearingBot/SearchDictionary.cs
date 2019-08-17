@@ -21,6 +21,8 @@ namespace AntiAntiSwearingBot
             words = File.ReadAllLines(path).ToList();
         }
 
+        public int Count => words.Count;
+
         public void Save()
         {
             if (File.Exists(tmppath))
