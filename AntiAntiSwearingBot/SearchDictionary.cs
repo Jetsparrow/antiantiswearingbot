@@ -11,6 +11,8 @@ namespace AntiAntiSwearingBot
         {
             var s = cfg.SearchDictionary;
             path = s.DictionaryPath;
+            tmppath = path + ".tmp";
+
             learnInitialRating = Math.Clamp(s.LearnInitialRating, 0,1);
             learnNudgeFactor = Math.Clamp(s.LearnNudgeFactor, 0, 1);
             unlearnNudgeFactor = Math.Clamp(s.UnlearnNudgeFactor, 0, 1);
@@ -21,8 +23,12 @@ namespace AntiAntiSwearingBot
 
         public void Save()
         {
-            File.WriteAllLines(path + ".tmp", words);
-            File.Move(path + ".tmp", path);
+            if (File.Exists(tmppath))
+                File.Delete(tmppath);
+            File.WriteAllLines(tmppath, words);
+            if (File.Exists(path))
+                File.Delete(path);
+            File.Move(tmppath, path);
         }
 
         public struct WordMatch
@@ -93,7 +99,7 @@ namespace AntiAntiSwearingBot
 
         #region service
 
-        string path;
+        readonly string path, tmppath;
 
         double learnInitialRating = 0.75;
         double learnNudgeFactor = 0.5;

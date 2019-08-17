@@ -26,6 +26,7 @@ namespace AntiAntiSwearingBot
                 Console.ReadKey();
                 Console.WriteLine("Waiting for exit...");
                 bot.Stop().Wait();
+                dict.Save();
                 return (int)ExitCode.Ok;
             }
             catch (Exception ex)

@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AntiAntiSwearingBot
 {
-    static class Language
+    public static class Language
     {
+        static int min(int a, int b, int c) { return Math.Min(Math.Min(a, b), c); }
+
         public static int HammingDistance(string a, string b)
         {
             if (string.IsNullOrEmpty(a))
@@ -25,8 +28,6 @@ namespace AntiAntiSwearingBot
 
             return leftover + dist;
         }
-
-        static int min(int a, int b, int c) { return Math.Min(Math.Min(a, b), c); }
 
         public static int LevenshteinDistance(string a, string b)
         {
@@ -55,46 +56,18 @@ namespace AntiAntiSwearingBot
         public static bool CharMatch(char a, char b)
             => a == b || !char.IsLetterOrDigit(a) || !char.IsLetterOrDigit(b);
 
-        /// <summary>
-        /// Compute the distance between two strings.
-        /// </summary>
-        public static int Compute(string s, string t)
-        {
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
+        static readonly Regex MentionRegex = new Regex("^@[a-zA-Z0-9_]+$", RegexOptions.Compiled);
 
-            if (n == 0)
-                return m;
-            if (m == 0)
-                return n;
+        static readonly Regex HashTagRegex = new Regex("^#\\w+$", RegexOptions.Compiled);
 
-            // Step 2
-            for (int i = 0; i <= n; d[i, 0] = i++)
-            {
-            }
+        public static bool IsTelegramMention(string word) => MentionRegex.IsMatch(word);
 
-            for (int j = 0; j <= m; d[0, j] = j++)
-            {
-            }
+        public static bool IsHashTag(string word) => HashTagRegex.IsMatch(word);
 
-            // Step 3
-            for (int i = 1; i <= n; i++)
-            {
-                //Step 4
-                for (int j = 1; j <= m; j++)
-                {
-                    // Step 5
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+        public static bool HasNonWordChars(string arg) => arg.Any(c => !char.IsLetterOrDigit(c));
 
-                    // Step 6
-                    d[i, j] = Math.Min(
-                        Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
-                        d[i - 1, j - 1] + cost);
-                }
-            }
-            // Step 7
-            return d[n, m];
-        }
+        public static bool HasWordChars(string arg) => arg.Any(char.IsLetter);
+
+
     }
 }

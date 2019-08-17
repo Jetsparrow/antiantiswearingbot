@@ -16,14 +16,13 @@ namespace AntiAntiSwearingBot
     {
         Config Config { get; }
         SearchDictionary Dict { get; }
+        Unbleeper Unbleeper { get; }
 
         public AntiAntiSwearingBot(Config cfg, SearchDictionary dict)
         {
             Config = cfg;
             Dict = dict;
-            BleepedSwearsRegex = new Regex(cfg.BleepedSwearsRegex, RegexOptions.Compiled);
-            NonWordRegex = new Regex("\\W", RegexOptions.Compiled);
-            MentionRegex = new Regex("@[a-zA-Z0-9_]+", RegexOptions.Compiled);
+            Unbleeper = new Unbleeper(dict, cfg.Unbleeper);
         }
 
         TelegramBotClient Client { get; set; }
@@ -49,40 +48,10 @@ namespace AntiAntiSwearingBot
 
         public async Task Stop()
         {
-            Dict.Save();
             Dispose();
         }
 
         #region service
-
-        Regex BleepedSwearsRegex { get; } 
-        Regex NonWordRegex { get; } 
-        Regex MentionRegex { get; }
-
-        string UnbleepSwears(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-                return null;
-
-            var words = BleepedSwearsRegex.Matches(text)
-                    .Select(m => m.Value)
-                    .Where(m => NonWordRegex.IsMatch(m))
-                    .Where(m => !MentionRegex.IsMatch(m))
-                    .ToArray();
-
-            if (words.Any())
-            {
-                var response = new StringBuilder();
-                for (int i = 0; i < words.Length; ++i)
-                {
-                    var m = Dict.Match(words[i]);
-                    response.AppendLine(new string('*', i + 1) + m.Word + new string('?', m.Distance));
-                }
-                return response.ToString();
-            }
-            else
-                return null;
-        }
 
         void BotOnMessageReceived(object sender, MessageEventArgs args)
         {
@@ -104,7 +73,7 @@ namespace AntiAntiSwearingBot
             }
             else
             {
-                var unbleepResponse = UnbleepSwears(msg.Text);
+                var unbleepResponse = Unbleeper.UnbleepSwears(msg.Text);
                 if (unbleepResponse != null)
                     Client.SendTextMessageAsync(
                         args.Message.Chat.Id,

@@ -29,10 +29,7 @@ namespace AntiAntiSwearingBot
                 if (cmd.UserName != null && cmd.UserName != Username)
                     return null;
                 if (Commands.ContainsKey(cmd.Command))
-                {
-                    try { return Commands[cmd.Command].Execute(cmd, args); }
-                    catch { }
-                }
+                    return Commands[cmd.Command].Execute(cmd, args);
             }
             return null;
         }

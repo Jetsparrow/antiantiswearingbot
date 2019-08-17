@@ -1,5 +1,7 @@
 {
-  "BleepedSwearsRegex": "[а-яА-Я@\\*#]+",
+  "Unbleeper": {
+    "BleepedSwearsRegex": "[а-яА-Я@\\*#]+"
+  },
   "SearchDictionary": {
     "DictionaryPath": "dict/ObsceneDictionaryRu.txt",
     "LearnNudgeFactor": 0.5,
