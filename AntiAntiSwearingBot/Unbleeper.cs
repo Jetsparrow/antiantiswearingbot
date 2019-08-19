@@ -20,6 +20,8 @@ namespace AntiAntiSwearingBot
 
         Regex BleepedSwearsRegex { get; }
 
+        static readonly char[] WORD_SEPARATORS = { ' ', '\t', '\r', '\n', '.', ',', '!', '?', ';' };
+
         public string UnbleepSwears(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -30,7 +32,7 @@ namespace AntiAntiSwearingBot
             if (text.StartsWith('/')) // is chat command
                 return null;
 
-            var words = text.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+            var words = text.Split(WORD_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
             var candidates = words
                 .Where(w =>
                     !Language.IsTelegramMention(w)

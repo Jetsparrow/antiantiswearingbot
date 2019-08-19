@@ -6,27 +6,35 @@ namespace AntiAntiSwearingBot.Tests
     public class FilterTests
     {
         Unbleeper ubl { get; }
+        Config cfg { get; }
+        SearchDictionary dict { get; }
+
         public FilterTests()
         {
-            var cfg = Config.Load<Config>("aasb.cfg.json", "aasb.cfg.secret.json");
-            var dict = new SearchDictionary(cfg);
+            cfg = Config.Load<Config>("aasb.cfg.json", "aasb.cfg.secret.json");
+            dict = new SearchDictionary(cfg);
             ubl = new Unbleeper(dict, cfg.Unbleeper);
-        }
-
-        [Theory]
-        [InlineData("бл**ь", "*блядь")]
-        [InlineData("ж**а", "*жопа")]
-        public void UnbleepSimpleSwears(string word, string expected)
-        {
-            var unbleep = ubl.UnbleepSwears(word).TrimEnd(Environment.NewLine.ToCharArray());
-            Assert.Equal(expected, unbleep);
         }
 
         [Theory]
         [InlineData("*")]
         [InlineData("**#")]
-        [InlineData("@**#")]
-        public void IgnoreShortGrawlixes(string text) => Assert.Null(ubl.UnbleepSwears(text));
+        [InlineData("@*#")]
+        public void IgnoreShortGrawlixesWithoutLetters(string text)
+        {
+            if (text.Length < cfg.Unbleeper.MinAmbiguousWordLength)
+                Assert.Null(ubl.UnbleepSwears(text));
+        }
+
+        [Theory]
+        [InlineData("*")]
+        [InlineData("*б")]
+        [InlineData("х#")]
+        public void IgnoreShortWords(string text)
+        {
+            if (text.Length < cfg.Unbleeper.MinWordLength)
+                Assert.Null(ubl.UnbleepSwears(text));
+        }
 
         [Theory]
         [InlineData("@pvkuznetsov https://github.com/jacksondunstan/UnityNativeScripting")]
