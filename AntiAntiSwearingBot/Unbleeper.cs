@@ -36,6 +36,7 @@ namespace AntiAntiSwearingBot
             var candidates = words
                 .Where(w =>
                     !Language.IsTelegramMention(w)
+                    && !Language.IsEmailPart(w)
                     && Language.HasNonWordChars(w)
                     && !Language.IsHashTag(w)
                     && (Language.HasWordChars(w) || w.Length >= Cfg.MinAmbiguousWordLength)

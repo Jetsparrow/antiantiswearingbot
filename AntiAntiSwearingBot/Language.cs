@@ -57,10 +57,13 @@ namespace AntiAntiSwearingBot
             => a == b || !char.IsLetterOrDigit(a) || !char.IsLetterOrDigit(b);
 
         static readonly Regex MentionRegex = new Regex("^@[a-zA-Z0-9_]+$", RegexOptions.Compiled);
+        static readonly Regex EmailPartRegex = new Regex("^\\w+@\\w+$", RegexOptions.Compiled);
 
         static readonly Regex HashTagRegex = new Regex("^#\\w+$", RegexOptions.Compiled);
 
         public static bool IsTelegramMention(string word) => MentionRegex.IsMatch(word);
+
+        public static bool IsEmailPart(string word) => EmailPartRegex.IsMatch(word);
 
         public static bool IsHashTag(string word) => HashTagRegex.IsMatch(word);
 

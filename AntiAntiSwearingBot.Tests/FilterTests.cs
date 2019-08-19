@@ -78,5 +78,13 @@ namespace AntiAntiSwearingBot.Tests
         [InlineData("#BalıkBurcuKızıylaEvlenmek")]
         public void IgnoreHashtags(string text) => Assert.Null(ubl.UnbleepSwears(text));
 
+        [Theory]
+        [InlineData("ipetrov@mail.ru")]
+        [InlineData("ipetrov@русская.mail.ru")]
+        [InlineData("ипетров@почта.рф")]
+        [InlineData("admin@local")]
+        [InlineData("админ@local")]
+        public void IgnoreEmails(string text) => Assert.Null(ubl.UnbleepSwears(text));
+
     }
 }
