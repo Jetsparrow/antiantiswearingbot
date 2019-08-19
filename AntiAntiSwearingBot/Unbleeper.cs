@@ -36,8 +36,8 @@ namespace AntiAntiSwearingBot
                     !Language.IsTelegramMention(w)
                     && Language.HasNonWordChars(w)
                     && !Language.IsHashTag(w)
-                    && (Language.HasWordChars(w) || w.Length > 5)
-                    && w.Length > 2
+                    && (Language.HasWordChars(w) || w.Length >= Cfg.MinAmbiguousWordLength)
+                    && w.Length >= Cfg.MinWordLength
                     && BleepedSwearsRegex.IsMatch(w)
                     )
                 .ToArray();

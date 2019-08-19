@@ -11,6 +11,8 @@
     public struct UnbleeperSettings
     {
         public string BleepedSwearsRegex { get; private set; }
+        public int MinAmbiguousWordLength { get; private set; }
+        public int MinWordLength { get; private set; }
     }
 
     public struct SearchDictionarySettings

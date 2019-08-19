@@ -1,6 +1,8 @@
 {
   "Unbleeper": {
-    "BleepedSwearsRegex": "[а-яА-Я@\\*#]+"
+    "BleepedSwearsRegex": "[а-яА-Я@\\*#]+",
+    "MinWordLength": 3,
+    "MinAmbiguousWordLength":  5
   },
   "SearchDictionary": {
     "DictionaryPath": "dict/ObsceneDictionaryRu.txt",
