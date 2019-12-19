@@ -20,7 +20,7 @@ namespace AntiAntiSwearingBot
 
         Regex BleepedSwearsRegex { get; }
 
-        static readonly char[] WORD_SEPARATORS = { ' ', '\t', '\r', '\n', '.', ',', '!', '?', ';', ':' };
+        static readonly char[] WORD_SEPARATORS = { ' ', '\t', '\r', '\n', '.', ',', '!', '?', ';', ':', '-', '—' };
 
         public string UnbleepSwears(string text)
         {
