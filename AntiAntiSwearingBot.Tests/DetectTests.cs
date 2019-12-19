@@ -30,6 +30,7 @@ namespace AntiAntiSwearingBot.Tests
         [Theory]
         [InlineData("Просто пи**ец, как хочется кушать.", "*пиздец")]
         [InlineData("Ужас на*уй!", "*нахуй")]
+        [InlineData("Получилась полная х**ня: даже не знаю, что и сказать, б**.", "*херня\n**бля")]
         [InlineData("Сергей опять вы**нулся своим знанием тонкостей русского языка; в окно еб*шил стылый ноябрьский ветер. ", "*выебнулся\n**ебашил")]
         public void DetectWordsWithPunctuation(string text, string expected)
         {
