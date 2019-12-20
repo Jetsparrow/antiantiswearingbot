@@ -21,18 +21,10 @@ namespace AntiAntiSwearingBot.Commands
 
             if (!Regex.IsMatch(word, @"[а-яА-Я]+"))
                 return null;
-                var res = Dict.Unlearn(word);
-
-            switch (res)
-            {
-                case SearchDictionary.UnlearnResult.Demoted:
-                    return $"Понизил слово \"{word}\"";
-                case SearchDictionary.UnlearnResult.Removed:
-                    return $"Удалил слово \"{word}\"";
-                case SearchDictionary.UnlearnResult.NotFound:
-                default:
-                    return $"Не нашел слово \"{word}\"";
-            }
+            if (Dict.Unlearn(word))
+                return $"Удалил слово \"{word}\"";
+            else
+                return $"Не нашел слово \"{word}\"";
         }
     }
 }
