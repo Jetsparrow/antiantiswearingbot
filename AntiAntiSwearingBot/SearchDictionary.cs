@@ -13,11 +13,6 @@ namespace AntiAntiSwearingBot
             path = s.DictionaryPath;
             tmppath = path + ".tmp";
 
-            learnInitialRating = Math.Clamp(s.LearnInitialRating, 0,1);
-            learnNudgeFactor = Math.Clamp(s.LearnNudgeFactor, 0, 1);
-            unlearnNudgeFactor = Math.Clamp(s.UnlearnNudgeFactor, 0, 1);
-            minUnlearnNudge = Math.Max(s.MinUnlearnNudge, 0);
-
             words = File.ReadAllLines(path).ToList();
         }
 
@@ -62,55 +57,30 @@ namespace AntiAntiSwearingBot
                 int index = words.IndexOf(word);
                 if (index > 0)
                 {
-                    int newIndex = (int)(index * learnNudgeFactor);
-                    words.Move(index, newIndex);
+                    words.Move(index, 0);
                     return false;
                 }
                 else
                 {
-                    words.Insert((int)(words.Count * learnInitialRating), word);
+                    words.Insert(0, word);
                     return true;
                 }
             }
         }
 
-        public enum UnlearnResult { NotFound, Demoted, Removed }
-        public UnlearnResult Unlearn(string word)
+        public bool Unlearn(string word)
         {
             lock (SyncRoot)
-            {
-                int index = words.IndexOf(word);
-                if (index < 0)
-                    return UnlearnResult.NotFound;
-
-                int indexFromEnd = words.Count - 1 - index;
-                int change = Math.Max(minUnlearnNudge, (int)(indexFromEnd * unlearnNudgeFactor ));
-                int newIndex = index + change;
-                if (newIndex > words.Count)
-                {
-                    words.RemoveAt(index);
-                    return UnlearnResult.Removed;
-                }
-                else
-                {
-                    words.Move(index, newIndex);
-                    return UnlearnResult.Demoted;
-                }
-            }
+                return words.Remove(word);
         }
 
         #region service
 
         readonly string path, tmppath;
 
-        double learnInitialRating = 0.75;
-        double learnNudgeFactor = 0.5;
-        double unlearnNudgeFactor = 0.66;
-        int minUnlearnNudge = 5;
-
         object SyncRoot = new object();
         List<string> words;
-        
+
         #endregion
     }
 }

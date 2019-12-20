@@ -18,11 +18,6 @@
     public struct SearchDictionarySettings
     {
         public string DictionaryPath { get; private set; }
-
-        public double LearnNudgeFactor { get; private set; }
-        public double LearnInitialRating { get; private set; }
-        public int MinUnlearnNudge { get; private set; }
-        public double UnlearnNudgeFactor { get; private set; }
     }
 
     public struct ProxySettings
