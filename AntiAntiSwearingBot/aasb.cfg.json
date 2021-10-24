@@ -1,6 +1,6 @@
 {
   "Unbleeper": {
-    "BleepedSwearsRegex": "[а-яА-Я@\\*#]+",
+    "BleepedSwearsRegex": "[а-яА-ЯёЁ@\\*#]+",
     "MinWordLength": 3,
     "MinAmbiguousWordLength": 5
   },
