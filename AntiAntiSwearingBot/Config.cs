@@ -1,29 +1,28 @@
 ﻿namespace AntiAntiSwearingBot;
 
-public class Config : ConfigBase
+public class ServiceSettings
 {
-    public string ApiKey { get; private set; }
-    public ProxySettings Proxy { get; private set; }
-    public SearchDictionarySettings SearchDictionary { get; private set; }
-    public UnbleeperSettings Unbleeper { get; private set; }
+    public string Urls { get; set; }
 }
 
-public struct UnbleeperSettings
+public class UnbleeperSettings
 {
-    public string BleepedSwearsRegex { get; private set; }
-    public int MinAmbiguousWordLength { get; private set; }
-    public int MinWordLength { get; private set; }
+    public string BleepedSwearsRegex { get; set; }
+    public int MinAmbiguousWordLength { get; set; }
+    public int MinWordLength { get; set; }
 }
 
-public struct SearchDictionarySettings
+public class SearchDictionarySettings
 {
-    public string DictionaryPath { get; private set; }
+    public string DictionaryPath { get; set; }
 }
 
-public struct ProxySettings
+public class TelegramSettings
 {
-    public string Url { get; private set; }
-    public int Port { get; private set; }
-    public string Login { get; private set; }
-    public string Password { get; private set; }
+    public string ApiKey { get; set; }
+    public bool UseProxy { get; set; }
+    public string Url { get; set; }
+    public int Port { get; set; }
+    public string Login { get; set; }
+    public string Password { get; set; }
 }

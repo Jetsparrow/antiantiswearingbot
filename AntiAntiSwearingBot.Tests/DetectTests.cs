@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
+using Microsoft.Extensions.Options;
+
 using Xunit;
 
 namespace AntiAntiSwearingBot.Tests
@@ -8,13 +11,12 @@ namespace AntiAntiSwearingBot.Tests
     public class DetectTests
     {
         Unbleeper ubl { get; }
-        Config cfg { get; }
         SearchDictionary dict { get; }
 
         public DetectTests()
         {
-            cfg = Config.Load<Config>("aasb.cfg.json");
-            dict = new SearchDictionary(cfg);
+
+            dict = new SearchDictionary(OptionsMonitor );
             ubl = new Unbleeper(dict, cfg.Unbleeper);
         }
 

@@ -1,81 +1,91 @@
 ﻿using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Microsoft.Extensions.Hosting;
 
 namespace AntiAntiSwearingBot;
-public class SearchDictionary
+public class SearchDictionary : BackgroundService
 {
-    public SearchDictionary(Config cfg)
+    public SearchDictionary(IOptionsMonitor<SearchDictionarySettings> cfg)
     {
-        var s = cfg.SearchDictionary;
-        path = s.DictionaryPath;
-        tmppath = path + ".tmp";
-
+        Cfg = cfg;
+        var path = cfg.CurrentValue.DictionaryPath;
         words = File.ReadAllLines(path).ToList();
     }
 
+    IOptionsMonitor<SearchDictionarySettings> Cfg { get; }
+    ReaderWriterLockSlim DictLock = new();
+    List<string> words;
+    bool Changed = false;
+
     public int Count => words.Count;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        try
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                if (Changed) Save();
+            }
+        }
+        finally
+        {
+            Save();
+        }
+    }
 
     public void Save()
     {
-        if (File.Exists(tmppath))
-            File.Delete(tmppath);
+        using var guard = DictLock.GetWriteLockToken();
+        Changed = false;
+
+        var path = Cfg.CurrentValue.DictionaryPath;
+        var tmppath = path + ".tmp";
+
         File.WriteAllLines(tmppath, words);
-        if (File.Exists(path))
-            File.Delete(path);
-        File.Move(tmppath, path);
+        File.Move(tmppath, path, overwrite: true);
     }
 
-    public struct WordMatch
-    {
-        public string Word;
-        public int Distance;
-        public int Rating;
-    }
+    public record struct WordMatch (string Word, int Distance, int Rating);
 
     public WordMatch Match(string pattern)
         => AllMatches(pattern).First();
 
     public IEnumerable<WordMatch> AllMatches(string pattern)
     {
-        lock (SyncRoot)
-        {
-            pattern = pattern.ToLowerInvariant();
-            return words
-                .Select((w, i) => new WordMatch { Word = w, Distance = Language.LevenshteinDistance(pattern, w), Rating = i })
-                .OrderBy(m => m.Distance)
-                .ThenBy(m => m.Rating);
-        }
+        using var guard = DictLock.GetReadLockToken();
+        return words
+            .Select((w, i) => new WordMatch(w, Language.LevenshteinDistance(pattern.ToLowerInvariant(), w), i))
+            .OrderBy(m => m.Distance)
+            .ThenBy(m => m.Rating);
     }
 
     public bool Learn(string word)
     {
-        lock (SyncRoot)
+        using var guard = DictLock.GetWriteLockToken();
+        Changed = true;
+
+        int index = words.IndexOf(word);
+        if (index > 0)
         {
-            int index = words.IndexOf(word);
-            if (index > 0)
-            {
-                words.Move(index, 0);
-                return false;
-            }
-            else
-            {
-                words.Insert(0, word);
-                return true;
-            }
+            words.Move(index, 0);
+            return false;
+        }
+        else
+        {
+            words.Insert(0, word);
+            return true;
         }
     }
 
     public bool Unlearn(string word)
     {
-        lock (SyncRoot)
-            return words.Remove(word);
+        using var guard = DictLock.GetWriteLockToken();
+        Changed = true;
+        return words.Remove(word);
     }
 
-    #region service
-
-    readonly string path, tmppath;
-
-    object SyncRoot = new object();
-    List<string> words;
-
-    #endregion
 }

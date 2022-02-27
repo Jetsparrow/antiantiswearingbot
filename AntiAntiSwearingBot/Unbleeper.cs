@@ -7,10 +7,10 @@ public class Unbleeper
     SearchDictionary Dict { get; }
     UnbleeperSettings Cfg { get; }
 
-    public Unbleeper(SearchDictionary dict, UnbleeperSettings cfg)
+    public Unbleeper(SearchDictionary dict, IOptions<UnbleeperSettings> cfg)
     {
         Dict = dict;
-        Cfg = cfg;
+        Cfg = cfg.Value;
         BleepedSwearsRegex = new Regex("^" + Cfg.BleepedSwearsRegex + "$", RegexOptions.Compiled);
     }
 
@@ -41,17 +41,15 @@ public class Unbleeper
                 )
             .ToArray();
 
-        if (candidates.Any())
-        {
-            var response = new StringBuilder();
-            for (int i = 0; i < candidates.Length; ++i)
-            {
-                var m = Dict.Match(candidates[i]);
-                response.AppendLine(new string('*', i + 1) + m.Word + new string('?', m.Distance));
-            }
-            return response.ToString();
-        }
-        else
+        if (!candidates.Any())
             return null;
+
+        var response = new StringBuilder();
+        for (int i = 0; i < candidates.Length; ++i)
+        {
+            var m = Dict.Match(candidates[i]);
+            response.AppendLine(new string('*', i + 1) + m.Word + new string('?', m.Distance));
+        }
+        return response.ToString();
     }
 }

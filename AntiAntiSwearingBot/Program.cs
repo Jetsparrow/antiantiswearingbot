@@ -1,31 +1,34 @@
-﻿using System.Threading;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using AntiAntiSwearingBot;
 
-static void Log(string m) => Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff}|{m}");
+var builder = WebApplication.CreateBuilder();
 
-Log("AntiAntiSwearBot starting....");
-
-var cfg = Config.Load<Config>("aasb.cfg.json", "aasb.cfg.secret.json");
-var dict = new SearchDictionary(cfg);
-Log($"{dict.Count} words loaded.");
-var bot = new AntiAntiSwearingBot.AntiAntiSwearingBot(cfg, dict);
-bot.Init().Wait();
-Log($"Connected to Telegram as @{bot.Me.Username}");
-Log("AntiAntiSwearBot started! Press Ctrl-C to exit.");
-
-ManualResetEvent quitEvent = new ManualResetEvent(false);
-try
+builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
 {
-    Console.CancelKeyPress += (sender, eArgs) => // ctrl-c
-    {
-        eArgs.Cancel = true;
-        quitEvent.Set();
-    };
-}
-catch { }
+    var env = hostingContext.HostingEnvironment.EnvironmentName;
+    config.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+    config.AddJsonFile($"secrets.{env}.json", optional: true, reloadOnChange: true);
+});
 
-quitEvent.WaitOne(Timeout.Infinite);
+var cfg = builder.Configuration;
+var svc = builder.Services;
 
-Console.WriteLine("Waiting for exit...");
-dict.Save();
+svc.Configure<SearchDictionarySettings>(cfg.GetSection("SearchDictionary"));
+svc.Configure<TelegramSettings>(cfg.GetSection("Telegram"));
+svc.Configure<UnbleeperSettings>(cfg.GetSection("Unbleeper"));
 
+svc.AddHealthChecks().AddCheck<StartupHealthCheck>("Startup");
+svc.AddHostedSingleton<SearchDictionary>();
+svc.AddSingleton<Unbleeper>();
+svc.AddHostedSingleton<Aasb>();
+
+var app = builder.Build();
+app.UseDeveloperExceptionPage();
+app.UseRouting();
+app.UseEndpoints(cfg =>
+{
+    cfg.MapHealthChecks("/health");
+});
+app.Run();

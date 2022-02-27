@@ -1,42 +1,43 @@
-﻿using System.Text.RegularExpressions;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
-using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using AntiAntiSwearingBot.Commands;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace AntiAntiSwearingBot;
 
-public class AntiAntiSwearingBot
+public class Aasb : IHostedService
 {
-    Config Config { get; }
     SearchDictionary Dict { get; }
     Unbleeper Unbleeper { get; }
+    ILogger Log { get; }
+    public bool Started { get; private set; } = false;
 
-    public AntiAntiSwearingBot(Config cfg, SearchDictionary dict)
+    public Aasb(ILogger<Aasb> log, IOptions<TelegramSettings> tgCfg, Unbleeper unbp)
     {
-        Config = cfg;
-        Dict = dict;
-        Unbleeper = new Unbleeper(dict, cfg.Unbleeper);
+        Log = log;
+        TelegramSettings = tgCfg.Value;
+        Unbleeper = unbp;
     }
 
+    TelegramSettings TelegramSettings { get; }
     TelegramBotClient TelegramBot { get; set; }
     ChatCommandRouter Router { get; set; }
     public User Me { get; private set; }
 
-    public async Task Init()
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(Config.ApiKey))
+        if (string.IsNullOrWhiteSpace(TelegramSettings.ApiKey))
             return;
 
-        TelegramBot = new TelegramBotClient(Config.ApiKey);
+        TelegramBot = new TelegramBotClient(TelegramSettings.ApiKey);
 
         Me = await TelegramBot.GetMeAsync();
-            
-            
+        Log.LogInformation("Connected to Telegram as @{Username}", Me.Username);
         Router = new ChatCommandRouter(Me.Username);
         Router.Add(new LearnCommand(Dict), "learn");
         Router.Add(new UnlearnCommand(Dict), "unlearn");
@@ -46,16 +47,19 @@ public class AntiAntiSwearingBot
             HandleUpdateAsync,
             HandleErrorAsync,
             receiverOptions);
+
+        Log.LogInformation("AntiAntiSwearBot started!");
+        Started = true;
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await TelegramBot.CloseAsync();
     }
 
     Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
     {
-        var ErrorMessage = exception switch
-        {
-            ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-            _ => exception.ToString()
-        };
-        Console.WriteLine(ErrorMessage);
+        Log.LogError(exception, "Exception while handling API message");
         return Task.CompletedTask;
     }
 
@@ -76,7 +80,8 @@ public class AntiAntiSwearingBot
                 await TelegramBot.SendTextMessageAsync(
                     msg.Chat.Id,
                     commandResponse,
-                    replyToMessageId: msg.MessageId);
+                    replyToMessageId: msg.MessageId,
+                    disableNotification: true);
             }
             else
             {
@@ -85,13 +90,13 @@ public class AntiAntiSwearingBot
                     await TelegramBot.SendTextMessageAsync(
                         msg.Chat.Id,
                         unbleepResponse,
-                        replyToMessageId: msg.MessageId);
+                        replyToMessageId: msg.MessageId,
+                        disableNotification: true);
             }
-
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Log.LogError(e, "Exception while handling message {0}", msg);
         }
     }
 }

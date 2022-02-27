@@ -41,6 +41,5 @@ Thumbs.db
 *.dotCover
 
 #secret config
-karma.cfg.json
-*secrets.ini
-*.secret.json
+secrets.json
+secrets.*.json
