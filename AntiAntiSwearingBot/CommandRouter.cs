@@ -1,47 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using Telegram.Bot.Args;
+﻿using Telegram.Bot.Types;
 using AntiAntiSwearingBot.Commands;
 
-namespace AntiAntiSwearingBot
+namespace AntiAntiSwearingBot;
+
+public interface IChatCommand
 {
-    public interface IChatCommand
+    string Execute(CommandString cmd, Update messageEventArgs);
+}
+
+public class ChatCommandRouter
+{
+    string Username { get; }
+    Dictionary<string, IChatCommand> Commands { get; }
+
+    public ChatCommandRouter(string username)
     {
-        string Execute(CommandString cmd, MessageEventArgs messageEventArgs);
+        Username = username;
+        Commands = new Dictionary<string, IChatCommand>();
     }
 
-    public class ChatCommandRouter
+    public string Execute(object sender, Update args)
     {
-        string Username { get; }
-        Dictionary<string, IChatCommand> Commands { get; }
-
-        public ChatCommandRouter(string username)
+        var text = args.Message.Text;
+        if (CommandString.TryParse(text, out var cmd))
         {
-            Username = username;
-            Commands = new Dictionary<string, IChatCommand>();
+            if (cmd.Username != null && cmd.Username != Username)
+                return null;
+            if (Commands.ContainsKey(cmd.Command))
+                return Commands[cmd.Command].Execute(cmd, args);
         }
+        return null;
+    }
 
-        public string Execute(object sender, MessageEventArgs args)
+    public void Add(IChatCommand c, params string[] cmds)
+    {
+        foreach (var cmd in cmds)
         {
-            var text = args.Message.Text;
-            if (CommandString.TryParse(text, out var cmd))
-            {
-                if (cmd.UserName != null && cmd.UserName != Username)
-                    return null;
-                if (Commands.ContainsKey(cmd.Command))
-                    return Commands[cmd.Command].Execute(cmd, args);
-            }
-            return null;
-        }
-
-        public void Add(IChatCommand c, params string[] cmds)
-        {
-            foreach (var cmd in cmds)
-            {
-                if (Commands.ContainsKey(cmd))
-                    throw new ArgumentException($"collision for {cmd}, commands {Commands[cmd].GetType()} and {c.GetType()}");
-                Commands[cmd] = c;
-            }
+            if (Commands.ContainsKey(cmd))
+                throw new ArgumentException($"collision for {cmd}, commands {Commands[cmd].GetType()} and {c.GetType()}");
+            Commands[cmd] = c;
         }
     }
 }
