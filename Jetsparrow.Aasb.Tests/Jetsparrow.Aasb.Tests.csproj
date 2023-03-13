@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AntiAntiSwearingBot\AntiAntiSwearingBot.csproj" />
+    <ProjectReference Include="..\Jetsparrow.Aasb\Jetsparrow.Aasb.csproj" />
   </ItemGroup>
 
 </Project>
