@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 using Xunit;
 
-namespace AntiAntiSwearingBot.Tests;
+namespace Jetsparrow.Aasb.Tests;
 
 public class DetectTests
 {

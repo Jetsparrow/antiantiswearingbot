@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Telegram.Bot.Types;
 
-namespace AntiAntiSwearingBot.Commands;
+namespace Jetsparrow.Aasb.Commands;
 public class UnlearnCommand : IChatCommand
 {
     SearchDictionary Dict { get; }

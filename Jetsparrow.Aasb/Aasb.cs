@@ -4,11 +4,11 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using AntiAntiSwearingBot.Commands;
+using Jetsparrow.Aasb.Commands;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace AntiAntiSwearingBot;
+namespace Jetsparrow.Aasb;
 
 public class Aasb : IHostedService
 {

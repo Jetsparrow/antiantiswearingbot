@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using AntiAntiSwearingBot;
+using Jetsparrow.Aasb;
 
 var builder = WebApplication.CreateBuilder();
 

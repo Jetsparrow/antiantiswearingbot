@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace AntiAntiSwearingBot.Commands;
+namespace Jetsparrow.Aasb.Commands;
 
 public class CommandString
 {

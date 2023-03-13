@@ -1,4 +1,4 @@
-﻿namespace AntiAntiSwearingBot;
+﻿namespace Jetsparrow.Aasb;
 
 public class ServiceSettings
 {

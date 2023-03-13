@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace AntiAntiSwearingBot;
+namespace Jetsparrow.Aasb;
 
 public readonly ref struct ReadLockToken
 {

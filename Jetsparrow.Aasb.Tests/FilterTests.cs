@@ -2,7 +2,7 @@
 
 using Xunit;
 
-namespace AntiAntiSwearingBot.Tests;
+namespace Jetsparrow.Aasb.Tests;
 
 public class FilterTests
 {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Hosting;
 
-namespace AntiAntiSwearingBot;
+namespace Jetsparrow.Aasb;
 public class SearchDictionary : BackgroundService
 {
     public SearchDictionary(IOptionsMonitor<SearchDictionarySettings> cfg)

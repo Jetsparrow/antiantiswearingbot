@@ -1,4 +1,4 @@
-﻿namespace AntiAntiSwearingBot.Tests;
+﻿namespace Jetsparrow.Aasb.Tests;
 
 public static class DefaultSettings
 {

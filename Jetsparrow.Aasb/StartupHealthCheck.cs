@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace AntiAntiSwearingBot;
+namespace Jetsparrow.Aasb;
 public class StartupHealthCheck : IHealthCheck
 {
     Aasb Bot { get; }

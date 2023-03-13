@@ -1,4 +1,4 @@
-﻿namespace AntiAntiSwearingBot;
+﻿namespace Jetsparrow.Aasb;
 public static class IListExtensions
 {
     public static void Move<T>(this IList<T> list, int from, int to)

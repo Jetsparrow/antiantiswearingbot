@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace AntiAntiSwearingBot;
+namespace Jetsparrow.Aasb;
 public static class Language
 {
     static int min(int a, int b, int c) { return Math.Min(Math.Min(a, b), c); }

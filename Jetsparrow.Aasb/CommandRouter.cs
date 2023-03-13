@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types;
-using AntiAntiSwearingBot.Commands;
+using Jetsparrow.Aasb.Commands;
 
-namespace AntiAntiSwearingBot;
+namespace Jetsparrow.Aasb;
 
 public interface IChatCommand
 {
