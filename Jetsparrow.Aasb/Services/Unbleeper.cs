@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Jetsparrow.Aasb;
-
+namespace Jetsparrow.Aasb.Services;
 public class Unbleeper
 {
     SearchDictionary Dict { get; }
@@ -11,43 +10,45 @@ public class Unbleeper
     {
         Dict = dict;
         Cfg = cfg.Value;
-        BleepedSwearsRegex = new Regex("^" + Cfg.BleepedSwearsRegex + "$", RegexOptions.Compiled);
+        var toBleep = Cfg.BleepedSwearsRegex;
+
+        if (!toBleep.StartsWith('^')) toBleep = "^" + toBleep;
+        if (!toBleep.EndsWith('$')) toBleep = toBleep + "$";
+        BleepedSwearsRegex = new Regex(toBleep, RegexOptions.Compiled);
     }
 
     Regex BleepedSwearsRegex { get; }
 
     static readonly char[] WORD_SEPARATORS = { ' ', '\t', '\r', '\n', '.', ',', '!', '?', ';', ':', '-', '—' };
 
-    public string UnbleepSwears(string text)
+    public async Task<string> UnbleepSwears(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return null;
 
         text = text.Trim();
 
-        if (text.StartsWith('/')) // is chat command
-            return null;
 
         var words = text.Split(WORD_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
         var candidates = words
             .Where(w =>
-                !Language.IsTelegramMention(w)
-                && !Language.IsEmailPart(w)
-                && Language.HasNonWordChars(w)
-                && !Language.IsHashTag(w)
-                && (Language.HasWordChars(w) || w.Length >= Cfg.MinAmbiguousWordLength)
+                StringEx.HasNonWordChars(w)
+                && (StringEx.HasWordChars(w) || w.Length >= Cfg.MinAmbiguousWordLength)
                 && w.Length >= Cfg.MinWordLength
+                && !StringEx.IsTelegramMention(w)
+                && !StringEx.IsEmailPart(w)
+                && !StringEx.IsHashTag(w)
                 && BleepedSwearsRegex.IsMatch(w)
-                )
-            .ToArray();
+            )
+            .ToList();
 
         if (!candidates.Any())
             return null;
 
         var response = new StringBuilder();
-        for (int i = 0; i < candidates.Length; ++i)
+        for (int i = 0; i < candidates.Count; ++i)
         {
-            var m = Dict.Match(candidates[i]);
+            var m = await Dict.Match(candidates[i]);
             response.AppendLine(new string('*', i + 1) + m.Word + new string('?', m.Distance));
         }
         return response.ToString();

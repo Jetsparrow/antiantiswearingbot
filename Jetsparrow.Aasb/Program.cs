@@ -1,34 +1,37 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Jetsparrow.Aasb;
+using Jetsparrow.Aasb.Services;
+using Jetsparrow.Aasb.Health;
 
 var builder = WebApplication.CreateBuilder();
-
-builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
-{
-    var env = hostingContext.HostingEnvironment.EnvironmentName;
-    config.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
-    config.AddJsonFile($"secrets.{env}.json", optional: true, reloadOnChange: true);
-});
+Console.WriteLine("Configuring...");
 
 var cfg = builder.Configuration;
 var svc = builder.Services;
 
-svc.Configure<SearchDictionarySettings>(cfg.GetSection("SearchDictionary"));
-svc.Configure<TelegramSettings>(cfg.GetSection("Telegram"));
-svc.Configure<UnbleeperSettings>(cfg.GetSection("Unbleeper"));
+svc.AddOptions<SearchDictionarySettings>().BindConfiguration("SearchDictionary").ValidateDataAnnotations();
+svc.AddOptions<TelegramSettings>().BindConfiguration("Telegram");
+svc.AddOptions<UnbleeperSettings>().BindConfiguration("Unbleeper");
+
 
 svc.AddHealthChecks().AddCheck<StartupHealthCheck>("Startup");
-svc.AddHostedSingleton<SearchDictionary>();
+svc.AddSingleton<SearchDictionary>();
 svc.AddSingleton<Unbleeper>();
-svc.AddHostedSingleton<Aasb>();
+svc.AddHostedSingleton<AntiAntiSwearingBot>();
 
+Console.WriteLine("Building...");
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
 app.UseRouting();
 app.UseEndpoints(cfg =>
 {
     cfg.MapHealthChecks("/health");
+    cfg.MapHealthChecks("/health/verbose", new()
+    {
+        ResponseWriter = HealthUtils.WriteHealthCheckResponse
+    });
 });
+
+Console.WriteLine("Running...");
 app.Run();

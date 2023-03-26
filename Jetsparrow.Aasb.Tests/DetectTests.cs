@@ -1,29 +1,13 @@
-﻿using System;
+﻿namespace Jetsparrow.Aasb.Tests;
 
-using Microsoft.Extensions.Options;
-
-using Xunit;
-
-namespace Jetsparrow.Aasb.Tests;
-
-public class DetectTests
+public class DetectTests : BleepTestsBase
 {
-    Unbleeper ubl { get; }
-    SearchDictionary dict { get; }
-
-    public DetectTests()
-    {
-
-        dict = new SearchDictionary(MockOptionsMonitor.Create(DefaultSettings.SearchDictionary));
-        ubl = new Unbleeper(dict, Options.Create(DefaultSettings.Unbleeper));
-    }
-
     [Theory]
     [InlineData("бл**ь", "*блядь")]
     [InlineData("ж**а", "*жопа")]
-    public void UnbleepSimpleSwears(string word, string expected)
+    public async Task UnbleepSimpleSwears(string word, string expected)
     {
-        var unbleep = ubl.UnbleepSwears(word).TrimEnd(Environment.NewLine.ToCharArray());
+        var unbleep = (await ubl.UnbleepSwears(word)).TrimEnd(Environment.NewLine.ToCharArray());
         Assert.Equal(expected, unbleep);
     }
 
@@ -34,9 +18,9 @@ public class DetectTests
     [InlineData("еб*ть—колотить", "*ебать")]
     [InlineData("Получилась полная х**ня: даже не знаю, что и сказать, б**.", "*херня\n**бля")]
     [InlineData("Сергей опять вы**нулся своим знанием тонкостей русского языка; в окно еб*шил стылый ноябрьский ветер. ", "*выебнулся\n**ебашил")]
-    public void DetectWordsWithPunctuation(string text, string expected)
+    public async void DetectWordsWithPunctuation(string text, string expected)
     {
-        var unbleep = ubl.UnbleepSwears(text).Replace("\r\n", "\n").Trim();
+        var unbleep = (await ubl.UnbleepSwears(text)).Replace("\r\n", "\n").Trim();
         Assert.Equal(expected, unbleep);
     }
 }

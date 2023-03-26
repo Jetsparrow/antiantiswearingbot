@@ -16,4 +16,10 @@
     <ProjectReference Include="..\Jetsparrow.Aasb\Jetsparrow.Aasb.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="dict\ObsceneDictionaryRu.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

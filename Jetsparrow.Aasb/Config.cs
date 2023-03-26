@@ -1,12 +1,10 @@
-﻿namespace Jetsparrow.Aasb;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class ServiceSettings
-{
-    public string Urls { get; set; }
-}
+namespace Jetsparrow.Aasb;
 
 public class UnbleeperSettings
 {
+    public string LegalWordsRegex { get; set; }
     public string BleepedSwearsRegex { get; set; }
     public int MinAmbiguousWordLength { get; set; }
     public int MinWordLength { get; set; }
@@ -15,14 +13,17 @@ public class UnbleeperSettings
 public class SearchDictionarySettings
 {
     public string DictionaryPath { get; set; }
+
+    [Range(typeof(TimeSpan), "00:00:10", "01:00:00")]
+    public TimeSpan AutosavePeriod { get; set; }
 }
 
 public class TelegramSettings
 {
     public string ApiKey { get; set; }
-    public bool UseProxy { get; set; }
-    public string Url { get; set; }
-    public int Port { get; set; }
-    public string Login { get; set; }
-    public string Password { get; set; }
+}
+
+public class AccessSettings
+{
+    public string[] AllowedChats { get; set; }
 }

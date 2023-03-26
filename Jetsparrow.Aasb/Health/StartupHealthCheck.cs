@@ -1,14 +1,13 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Jetsparrow.Aasb.Services;
 
-namespace Jetsparrow.Aasb;
+namespace Jetsparrow.Aasb.Health;
 public class StartupHealthCheck : IHealthCheck
 {
-    Aasb Bot { get; }
+    AntiAntiSwearingBot Bot { get; }
 
-    public StartupHealthCheck(Aasb bot)
+    public StartupHealthCheck(AntiAntiSwearingBot bot)
     {
         Bot = bot;
     }

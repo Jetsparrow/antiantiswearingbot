@@ -1,20 +1,6 @@
-﻿using Microsoft.Extensions.Options;
-
-using Xunit;
-
-namespace Jetsparrow.Aasb.Tests;
-
-public class FilterTests
+﻿namespace Jetsparrow.Aasb.Tests;
+public class FilterTests : BleepTestsBase
 {
-    Unbleeper ubl { get; }
-    SearchDictionary dict { get; }
-
-    public FilterTests()
-    {
-        dict = new SearchDictionary(MockOptionsMonitor.Create(DefaultSettings.SearchDictionary));
-        ubl = new Unbleeper(dict, Options.Create(DefaultSettings.Unbleeper));
-    }
-
     [Theory]
     [InlineData("*")]
     [InlineData("**#")]

@@ -1,9 +1,9 @@
-﻿using System.Text.RegularExpressions;
-using Telegram.Bot.Types;
+﻿using Jetsparrow.Aasb.Services;
 
 namespace Jetsparrow.Aasb.Commands;
 public class UnlearnCommand : IChatCommand
 {
+    public bool Authorize => true;
     SearchDictionary Dict { get; }
 
     public UnlearnCommand(SearchDictionary dict)
@@ -11,17 +11,15 @@ public class UnlearnCommand : IChatCommand
         Dict = dict;
     }
 
-    public string Execute(CommandString cmd, Update args)
+    public string Execute(CommandContext cmd)
     {
         var word = cmd.Parameters.FirstOrDefault();
         if (string.IsNullOrWhiteSpace(word))
             return null;
 
-        if (!Regex.IsMatch(word, @"[а-яА-Я]+"))
-            return null;
         if (Dict.Unlearn(word))
-            return $"Удалил слово \"{word}\"";
+            return $"Больше не буду";
         else
-            return $"Не нашел слово \"{word}\"";
+            return $"А я и не знаю что такое \"{word}\"";
     }
 }
