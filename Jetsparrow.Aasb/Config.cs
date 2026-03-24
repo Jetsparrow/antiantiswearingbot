@@ -21,6 +21,7 @@ public class SearchDictionarySettings
 public class TelegramSettings
 {
     public string ApiKey { get; set; }
+    public string Proxy { get; set; }
 }
 
 public class AccessSettings

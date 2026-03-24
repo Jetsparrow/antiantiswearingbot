@@ -1,10 +1,11 @@
-﻿using System.Text.RegularExpressions;
-
+﻿using Jetsparrow.Aasb.Commands;
+using System.Net;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Jetsparrow.Aasb.Commands;
 
 namespace Jetsparrow.Aasb.Services;
 
@@ -37,11 +38,20 @@ public class AntiAntiSwearingBot : IHostedService
     {
         if (string.IsNullOrWhiteSpace(TelegramSettings.ApiKey))
         {
-            Log.LogWarning("No ApiKey found in config!");
+            Log.LogCritical("No ApiKey found in config!");
             throw new Exception("No ApiKey found in config!");
-            return;
         }
-        TelegramBot = new TelegramBotClient(TelegramSettings.ApiKey);
+
+        var httpClientHandler = new HttpClientHandler();
+
+        if (TelegramSettings.Proxy is string url)
+        {
+            httpClientHandler.Proxy = new WebProxy(url);
+            httpClientHandler.UseProxy = true;
+        }
+        var httpClient = new HttpClient(httpClientHandler);
+
+        TelegramBot = new TelegramBotClient(TelegramSettings.ApiKey, httpClient);
         
         Log.LogInformation("Connecting to Telegram...");
         Me = await TelegramBot.GetMeAsync();
