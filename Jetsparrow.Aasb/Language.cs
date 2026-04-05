@@ -52,11 +52,13 @@ public static class StringEx
         => a == b || !char.IsLetterOrDigit(a) || !char.IsLetterOrDigit(b);
 
     static readonly Regex MentionRegex = new Regex("^@[a-zA-Z0-9_]+$", RegexOptions.Compiled);
+    static readonly Regex TelegramCommandRegex = new Regex("^/[a-zA-Z0-9_]+@?[a-zA-Z0-9_]*", RegexOptions.Compiled);
     static readonly Regex EmailPartRegex = new Regex("^\\w+@\\w+$", RegexOptions.Compiled);
 
     static readonly Regex HashTagRegex = new Regex("^#\\w+$", RegexOptions.Compiled);
 
     public static bool IsTelegramMention(string word) => MentionRegex.IsMatch(word);
+    public static bool IsTelegramCommand(string word) => TelegramCommandRegex.IsMatch(word);
 
     public static bool IsEmailPart(string word) => EmailPartRegex.IsMatch(word);
 

@@ -26,6 +26,9 @@ public class Unbleeper
         if (string.IsNullOrWhiteSpace(text))
             return null;
 
+        if (StringEx.IsTelegramCommand(text))
+            return null;
+
         text = text.Trim();
 
 
