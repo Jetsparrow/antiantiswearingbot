@@ -5,20 +5,20 @@ public class FilterTests : BleepTestsBase
     [InlineData("*")]
     [InlineData("**#")]
     [InlineData("@*#")]
-    public void IgnoreShortGrawlixesWithoutLetters(string text)
+    public async Task IgnoreShortGrawlixesWithoutLetters(string text)
     {
         if (text.Length < DefaultSettings.Unbleeper.MinAmbiguousWordLength)
-            Assert.Null(ubl.UnbleepSwears(text));
+            Assert.Null(await ubl.UnbleepSwears(text));
     }
 
     [Theory]
     [InlineData("*")]
     [InlineData("*б")]
     [InlineData("х#")]
-    public void IgnoreShortWords(string text)
+    public async Task IgnoreShortWords(string text)
     {
         if (text.Length < DefaultSettings.Unbleeper.MinWordLength)
-            Assert.Null(ubl.UnbleepSwears(text));
+            Assert.Null(await ubl.UnbleepSwears(text));
     }
 
     [Theory]
@@ -27,11 +27,11 @@ public class FilterTests : BleepTestsBase
     [InlineData("@Artyom по поводу")]
     [InlineData("@Laima прошу блины!")]
     [InlineData("эй админ @harry0xfefecaca верни бота")]
-    public void IgnoreMentions(string text) => Assert.Null(ubl.UnbleepSwears(text));
+    public async Task IgnoreMentions(string text) => Assert.Null(await ubl.UnbleepSwears(text));
 
     [Theory]
     [InlineData("x - floor(abs(x)) * sign(x) -- вроде такая формула для frac(x)")]
-    public void IgnoresWeirdShit(string text) => Assert.Null(ubl.UnbleepSwears(text));
+    public async Task IgnoresWeirdShit(string text) => Assert.Null(await ubl.UnbleepSwears(text));
 
     [Theory]
     [InlineData("/poll")]
@@ -40,7 +40,7 @@ public class FilterTests : BleepTestsBase
     [InlineData("/status@MinecraftServerBot")]
     [InlineData("/broadcast@MinecraftServerBot пи#*ец вы понастроили тут")]
     [InlineData("/ban@MinecraftServerBot @dirty_johnny86")]
-    public void IgnoreCommands(string text) => Assert.Null(ubl.UnbleepSwears(text));
+    public async Task IgnoreCommands(string text) => Assert.Null(await ubl.UnbleepSwears(text));
 
     [Theory]
     [InlineData("#UEeğitimKarazin")]
@@ -61,7 +61,7 @@ public class FilterTests : BleepTestsBase
     [InlineData("#ZodiacKillerStrikesAgain")]
     [InlineData("#ThanksObama")]
     [InlineData("#BalıkBurcuKızıylaEvlenmek")]
-    public void IgnoreHashtags(string text) => Assert.Null(ubl.UnbleepSwears(text));
+    public async Task IgnoreHashtags(string text) => Assert.Null(await ubl.UnbleepSwears(text));
 
     [Theory]
     [InlineData("ipetrov@mail.ru")]
@@ -69,6 +69,6 @@ public class FilterTests : BleepTestsBase
     [InlineData("ипетров@почта.рф")]
     [InlineData("admin@local")]
     [InlineData("админ@local")]
-    public void IgnoreEmails(string text) => Assert.Null(ubl.UnbleepSwears(text));
+    public async Task IgnoreEmails(string text) => Assert.Null(await ubl.UnbleepSwears(text));
 
 }
