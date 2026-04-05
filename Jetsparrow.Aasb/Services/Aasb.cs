@@ -54,7 +54,7 @@ public class AntiAntiSwearingBot : IHostedService
         TelegramBot = new TelegramBotClient(TelegramSettings.ApiKey, httpClient);
         
         Log.LogInformation("Connecting to Telegram...");
-        Me = await TelegramBot.GetMeAsync();
+        Me = await TelegramBot.GetMe(cancellationToken);
         Log.LogInformation("Connected to Telegram as @{Username}", Me.Username);
         Router = new ChatCommandRouter(Me.Username, AccessCfg);
         Router.Register(new LearnCommand(Dict), "learn");
@@ -74,7 +74,7 @@ public class AntiAntiSwearingBot : IHostedService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        await TelegramBot.CloseAsync();
+        await TelegramBot.Close();
     }
 
     Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -97,23 +97,26 @@ public class AntiAntiSwearingBot : IHostedService
 
                 if (cmdResponse != null)
                 {
-                    await TelegramBot.SendTextMessageAsync(
-                        msg.Chat.Id,
+                    await TelegramBot.SendMessage(
+                        msg.Chat,
                         cmdResponse,
-                        replyToMessageId: msg.MessageId,
+                        replyParameters: new ReplyParameters { MessageId = msg.MessageId },
                         parseMode: ParseMode.MarkdownV2,
-                        disableNotification: true);
+                        disableNotification: true,
+                        cancellationToken: cancellationToken);
                 }
             }
             else
             {
                 var unbleepResponse = await Unbleeper.UnbleepSwears(msg.Text);
                 if (unbleepResponse != null)
-                    await TelegramBot.SendTextMessageAsync(
-                        msg.Chat.Id,
+                    await TelegramBot.SendMessage(
+                        msg.Chat,
                         unbleepResponse,
-                        replyToMessageId: msg.MessageId,
-                        disableNotification: true);
+                        replyParameters: new ReplyParameters { MessageId = msg.MessageId },
+                        disableNotification: true,
+                        cancellationToken: cancellationToken);
+
             }
         }
         catch (Exception e)

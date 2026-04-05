@@ -18,7 +18,7 @@ public class DetectTests : BleepTestsBase
     [InlineData("еб*ть—колотить", "*ебать")]
     [InlineData("Получилась полная х**ня: даже не знаю, что и сказать, б**.", "*херня\n**бля")]
     [InlineData("Сергей опять вы**нулся своим знанием тонкостей русского языка; в окно еб*шил стылый ноябрьский ветер. ", "*выебнулся\n**ебашил")]
-    public async void DetectWordsWithPunctuation(string text, string expected)
+    public async Task DetectWordsWithPunctuation(string text, string expected)
     {
         var unbleep = (await ubl.UnbleepSwears(text)).Replace("\r\n", "\n").Trim();
         Assert.Equal(expected, unbleep);
